@@ -15,7 +15,7 @@
 go.work
 
 # Build output
-/build/
+# /build/
 /bin/
 
 # IDE
@@ -30,7 +30,7 @@ go.work
 Thumbs.db
 
 # Generated files
-*.gen.go
+# *.gen.go
 
 # Environment files
 .env
