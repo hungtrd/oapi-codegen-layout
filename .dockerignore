@@ -1,0 +1,33 @@
+# Build artifacts
+build/
+bin/
+
+# Generated files
+*.gen.go
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+docs/
+
+# Test files
+*_test.go
+coverage.out
+coverage.html
+
+# Environment files
+.env
+.env.local
