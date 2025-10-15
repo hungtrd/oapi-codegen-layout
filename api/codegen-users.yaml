@@ -1,5 +1,0 @@
-package: users
-generate:
-  models: true
-  embedded-spec: true
-output: pkg/api/models/users/types.gen.go

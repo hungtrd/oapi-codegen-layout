@@ -1,177 +1,171 @@
-openapi: 3.0.3
-info:
-  title: User Paths
-  version: 1.0.0
-
-paths:
-  /users:
-    get:
-      summary: List all users
-      operationId: listUsers
-      tags:
-        - users
-      parameters:
-        - name: limit
-          in: query
-          description: Maximum number of users to return
-          required: false
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            maximum: 100
-            default: 20
-      responses:
-        '200':
-          description: List of users
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '../openapi.yaml#/components/schemas/User'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '../openapi.yaml#/components/schemas/Error'
-
-    post:
-      summary: Create a new user
-      operationId: createUser
-      tags:
-        - users
-      requestBody:
-        required: true
+/users:
+  get:
+    summary: List all users
+    operationId: listUsers
+    tags:
+      - users
+    parameters:
+      - name: limit
+        in: query
+        description: Maximum number of users to return
+        required: false
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          default: 20
+    responses:
+      "200":
+        description: List of users
         content:
           application/json:
             schema:
-              $ref: '../openapi.yaml#/components/schemas/CreateUserRequest'
-      responses:
-        '201':
-          description: User created successfully
-          content:
-            application/json:
-              schema:
-                $ref: '../openapi.yaml#/components/schemas/User'
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '../openapi.yaml#/components/schemas/Error'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '../openapi.yaml#/components/schemas/Error'
-
-  /users/{userId}:
-    get:
-      summary: Get a user by ID
-      operationId: getUserById
-      tags:
-        - users
-      parameters:
-        - name: userId
-          in: path
-          description: User ID
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: User details
-          content:
-            application/json:
-              schema:
-                $ref: '../openapi.yaml#/components/schemas/User'
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '../openapi.yaml#/components/schemas/Error'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '../openapi.yaml#/components/schemas/Error'
-
-    put:
-      summary: Update a user
-      operationId: updateUser
-      tags:
-        - users
-      parameters:
-        - name: userId
-          in: path
-          description: User ID
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
+              type: array
+              items:
+                $ref: "../schemas/User.yaml"
+      "500":
+        description: Internal server error
         content:
           application/json:
             schema:
-              $ref: '../openapi.yaml#/components/schemas/UpdateUserRequest'
-      responses:
-        '200':
-          description: User updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: '../openapi.yaml#/components/schemas/User'
-        '400':
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: '../openapi.yaml#/components/schemas/Error'
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '../openapi.yaml#/components/schemas/Error'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '../openapi.yaml#/components/schemas/Error'
+              $ref: "../schemas/Error.yaml"
 
-    delete:
-      summary: Delete a user
-      operationId: deleteUser
-      tags:
-        - users
-      parameters:
-        - name: userId
-          in: path
-          description: User ID
-          required: true
+  post:
+    summary: Create a new user
+    operationId: createUser
+    tags:
+      - users
+    requestBody:
+      required: true
+      content:
+        application/json:
           schema:
-            type: string
-            format: uuid
-      responses:
-        '204':
-          description: User deleted successfully
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '../openapi.yaml#/components/schemas/Error'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '../openapi.yaml#/components/schemas/Error'
+            $ref: "../schemas/CreateUserRequest.yaml"
+    responses:
+      "201":
+        description: User created successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/User.yaml"
+      "400":
+        description: Invalid input
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/Error.yaml"
+      "500":
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/Error.yaml"
+
+/users/{userId}:
+  get:
+    summary: Get a user by ID
+    operationId: getUserById
+    tags:
+      - users
+    parameters:
+      - name: userId
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "200":
+        description: User details
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/User.yaml"
+      "404":
+        description: User not found
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/Error.yaml"
+      "500":
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/Error.yaml"
+
+  put:
+    summary: Update a user
+    operationId: updateUser
+    tags:
+      - users
+    parameters:
+      - name: userId
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/UpdateUserRequest.yaml"
+    responses:
+      "200":
+        description: User updated successfully
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/User.yaml"
+      "400":
+        description: Invalid input
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/Error.yaml"
+      "404":
+        description: User not found
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/Error.yaml"
+      "500":
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/Error.yaml"
+
+  delete:
+    summary: Delete a user
+    operationId: deleteUser
+    tags:
+      - users
+    parameters:
+      - name: userId
+        in: path
+        description: User ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      "204":
+        description: User deleted successfully
+      "404":
+        description: User not found
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/Error.yaml"
+      "500":
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/Error.yaml"

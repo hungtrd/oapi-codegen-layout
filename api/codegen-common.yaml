@@ -1,5 +1,0 @@
-package: common
-generate:
-  models: true
-  embedded-spec: true
-output: pkg/api/models/common/types.gen.go

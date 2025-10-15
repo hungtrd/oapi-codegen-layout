@@ -1,0 +1,32 @@
+type: object
+required:
+  - id
+  - name
+  - price
+  - category
+  - createdAt
+properties:
+  id:
+    type: string
+    format: uuid
+  name:
+    type: string
+  description:
+    type: string
+  price:
+    type: number
+    format: double
+    minimum: 0
+  category:
+    type: string
+  stock:
+    type: integer
+    format: int32
+    minimum: 0
+    default: 0
+  createdAt:
+    type: string
+    format: date-time
+  updatedAt:
+    type: string
+    format: date-time

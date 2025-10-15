@@ -92,23 +92,53 @@ type ListProductsParams struct {
 	Limit *int32 `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
+// CreateProductJSONBody defines parameters for CreateProduct.
+type CreateProductJSONBody struct {
+	Category    string  `json:"category"`
+	Description *string `json:"description,omitempty"`
+	Name        string  `json:"name"`
+	Price       float64 `json:"price"`
+	Stock       *int32  `json:"stock,omitempty"`
+}
+
+// UpdateProductJSONBody defines parameters for UpdateProduct.
+type UpdateProductJSONBody struct {
+	Category    *string  `json:"category,omitempty"`
+	Description *string  `json:"description,omitempty"`
+	Name        *string  `json:"name,omitempty"`
+	Price       *float64 `json:"price,omitempty"`
+	Stock       *int32   `json:"stock,omitempty"`
+}
+
 // ListUsersParams defines parameters for ListUsers.
 type ListUsersParams struct {
 	// Limit Maximum number of users to return
 	Limit *int32 `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
+// CreateUserJSONBody defines parameters for CreateUser.
+type CreateUserJSONBody struct {
+	Email openapi_types.Email `json:"email"`
+	Name  string              `json:"name"`
+}
+
+// UpdateUserJSONBody defines parameters for UpdateUser.
+type UpdateUserJSONBody struct {
+	Email *openapi_types.Email `json:"email,omitempty"`
+	Name  *string              `json:"name,omitempty"`
+}
+
 // CreateProductJSONRequestBody defines body for CreateProduct for application/json ContentType.
-type CreateProductJSONRequestBody = CreateProductRequest
+type CreateProductJSONRequestBody CreateProductJSONBody
 
 // UpdateProductJSONRequestBody defines body for UpdateProduct for application/json ContentType.
-type UpdateProductJSONRequestBody = UpdateProductRequest
+type UpdateProductJSONRequestBody UpdateProductJSONBody
 
 // CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
-type CreateUserJSONRequestBody = CreateUserRequest
+type CreateUserJSONRequestBody CreateUserJSONBody
 
 // UpdateUserJSONRequestBody defines body for UpdateUser for application/json ContentType.
-type UpdateUserJSONRequestBody = UpdateUserRequest
+type UpdateUserJSONRequestBody UpdateUserJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -442,27 +472,28 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+xY32/bNhD+Vwhuj26kpB1Q6K1duyxABwQd8jTkgZHONhuJZMijGyPw/z6QlCzZovwD",
-	"TVxhy5P1g8c73n33nT4/0VxWSgoQaGj2RE0+h4r5y981MIRrLQub41d4sGDQPVdaKtDIwa/KGcJM6qW7",
-	"rtjjFxAznNPsPE0ntOJifT+huFRAM2pQczGjqwktwOSaK+RS9K3TiIFgFWytvDjAj9I893ZTqSuGNKOF",
-	"tHclUG/JK1vRrHUnbHUH2tkZlPm9sytgymyJftV6Dy7w7UV8Cy4QZm6P1YRqeLBcQ0Gzf0L8TTyTNnW3",
-	"a0t59w1ydM5D9m8M6MHUQ8V4uXGu8OSwzO2v0Fb0zeZ+r1jIn7WWOoIQWXjfvaAqMIbNYu+2PPsd2vUx",
-	"338CK3H+FYySwkA/CIMMbcjaI6tU6a3vY6lCXoFBVqlNxDCEN+4V3Zem2lN3o1jAdV/tbqhecLlHRfEB",
-	"Dw2u12W997zY2MtaXuxC0Ii6a0KtKo5Lx1at/FGHurKb7VgFb7zzV358OpoTB1L5s8muH5aBGJ8d34NH",
-	"BP+j7fgsLbFB9bv7wNlzMZWhkzuApZ8D0ZIP11fEGi5mRDLF3zgyn4Eg3znOySUXninRE3LHgk7oArQJ",
-	"O52fpWepO5xUIJjiNKNvz9Kzt65rGc59VZK5nwDucgb+8K5mzMVyVdCMXgKGGUHdecOY8IYXaRqmlEAQ",
-	"3pApVfLcmybfTGi+8F3krn7VMKUZ/SVpP5yS+qsp2ZpCPjmbSfkb9ILnQLghIeClr4CxVcUcSdSDjORz",
-	"yO8JiEJJLtDliM2Mq099zFtnlahAPmbw1F+4wetmkcuWZhUgaLfVdr3+4CWCJs2e5G5JOlzI3ZIHC/4m",
-	"oK9LlW1+evDa9vMXe3TkQAKREDltXaIkGtBqMeCw5BXHDW/r4XERnR7BVdv/9V2ElW5/EBYcoTL78NEM",
-	"/ZZsmNZsGQOKq1w3N87mt2eEavhYizi+EghasJIY0AvQBOqFXZD64FhZttG1AF0/unWjRZoIKjeUBQ38",
-	"AwY/ymL5bOeLqpfVJtuhtrDq1f382WJYl7uf5foVqamVGJvnYMzUluXSlfrdaUq9YCUvCBfK4qgAFqpH",
-	"GBHwvQFZHGNdGkye6qurYhXIoQSEPv4++ect/nbSYlOpq08NKbmZ03LS2iXdhlaXp/YM9Aj9vOtP1CaU",
-	"cK4YaN69fPmaIIREMpVWFKMCTigtYbtBMxn8RqhP93Hp6zlKYKSn5KcCkPHSvKLLo+sSsIWW+0DytY9P",
-	"PhsB2IZkHBG+nn/8RsXxQeP3pPCu1dJIxu9rh9Udso+/3dC3xrfNDuFz41fs6bK+GvEb/+eliP9v4wgd",
-	"EtI9ShFi6zo3QAn3++SHT8BLao/u31knFh6huP20uuevkuMAyWEDOLYRtead5Mn9HCQzapztJCFfl6E5",
-	"Hzy9vLrwQfxUaeEjGLmuGEDGsKJwhzpETpweA+lp+ObUEmLEKAr6wRWzJx46Q2tYOYyGS15KMBw9M0+E",
-	"4f+hThhxG61FwtCYdqu9eaxBPsECSqkqEFg7oRNqdUkzOkdUWZKUMmflXBrM3qfv04QpnizO6ep29W8A",
-	"AAD//5xE3WUuIwAA",
+	"H4sIAAAAAAAC/+xYW2/jNhP9KwS/79EbKZcCC73tNts0wBYItshTERSMNLa5kUiFHHpjBP7vBUnJki3K",
+	"l27iC+qnyBLJGc6cOTMnrzSVRSkFCNQ0eaU6HUPB3OOvChjCnZKZSfEbPBvQaN+XSpagkINblTKEkVRT",
+	"+1ywl68gRjimyXkcD2jBxfz3gOK0BJpQjYqLEZ0NaAY6VbxELkV3dxzYIFgBSysvNrBTKp66fUOpCoY0",
+	"oZk0jzlQt5MXpqBJY06Y4hGU3adRpk92XwZDZnJ0q+ZncIGXF+EjuEAY2TNmA6rg2XAFGU3+8v7X/gya",
+	"0D3Md8rH75CiNe6jf69B9YYeCsbzhXv5N5tFbn2GlryvD3dnhVz+opRUAYTIzNnuOFWA1mwU+rZk2Z3Q",
+	"rA/Z/h1YjuNvoEspNHSd0MjQ+Ki9sKLM3e6nUKiQF6CRFeUiYhjCB/uJrgtTZal9UMjhqq5WF1THudSh",
+	"IvuEmzrXqbLOd54tnGUMz1Yh6ICqa0BNmW0XjqVcuav2VWU72qEM3jvjJ3583ZoTe0K5b7LruqUhxGfb",
+	"1+AWzv9sOb5JSSxQ/bo6qEaGv0/zwj7nhcUsHNXcULu+z/mh9uHo5oja8dM8cezzRJ3J01zxZnPFYkgP",
+	"br6Yu3eaM9bOGXY/F0PpK7wFYPrFEzH5dHdLjOZiRCQr+QdL+iMQ5AfHMbnhwjEpOsJu7aADOgGl/Unn",
+	"Z/FZbC8nSxCs5DShl2fx2aWtZoZjl5Vo7DqEfRyBu7zNGbO+3GY0oTeAvodQe1/fRtzGizj23UwgCLeR",
+	"lWXOU7c1+q59MXpI2Kf/KxjShP4vav5BE1WAiXq6lQvSYnD+BDXhKRCuiXd86jKhTVEwSx6VcCbpGNIn",
+	"AiIrJRdoY8VG2uapuu6D3RWVnpR07+2/co139SIbNcUKQFD2qOW8/cZzBEXqM8njlLS4ktslzwbcD4/C",
+	"NpU2cerAbNnOH+zFkgbxBEPksDGJkihAo0SPwZwXHBeszZvLRbC7eFMNH1S/Amz18JPw4AiF3hQn9XDQ",
+	"kBBTik1DgLEZbMfI7vnlHaDrh72AA7cCQQmWEw1qAopAtbANWucky/PGywaw81cPtgVJHUDpglKhnpdA",
+	"42eZTd/8nkFVNFtkQ1QGZh08nL+5L3MYdKNefSIVBRNt0hS0Hpo8n1oIXO0WAhOW84xwURo8SAD6rBJG",
+	"BPyoQRjGYJs2o9fq6TabeTLJAaGLz2v3vsHnShqtM3d7XZOY7VUNh81N0mXItXltzSAQoKurbieuXfH3",
+	"CoHoandprJ0REslQGpEdJJB8qglbDaJB76xR3fLz1OX3IIES74PHMkDGc31CXRB1N4AN5Ozg5TAR7qAm",
+	"ALwFiXpAuHu/Nh4U5Ru18b3Av1JnB9bGT5XYqUSPq3X8b4cIo115rRBe927FmmrsqiF38H9GCrn/tWyh",
+	"g3zYD1oEmSrvNXD873XyxwViF9qn/W+3PQkfn/RumO37k+T5F5LHePAsI27OU9Gr/bORzKlwuJK0XJ76",
+	"5gdv6f3VjXPiIKSN8+RIdE0PUvoVjb3cJnJm95iId8tL+5IwR4Aur19skjvipdX8+pXLwXDOewuWrXvv",
+	"jjF+0inHUG5zkdLX9u1qtz1USNcwgVyWBQisjNABNSqnCR0jlkkU5TJl+VhqTD7GH+OIlTyanNPZw+yf",
+	"AAAA//8DV3R0niwAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

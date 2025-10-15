@@ -1,0 +1,9 @@
+type: object
+properties:
+  email:
+    type: string
+    format: email
+  name:
+    type: string
+    minLength: 1
+    maxLength: 100
