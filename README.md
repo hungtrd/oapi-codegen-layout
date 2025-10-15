@@ -6,24 +6,49 @@ A Go project following the [golang-standards/project-layout](https://github.com/
 
 ```
 .
-├── api/                    # OpenAPI/Swagger specs and code generation config
-│   ├── openapi.yaml       # OpenAPI specification
-│   └── oapi-codegen.yaml  # Code generation configuration
-├── build/                  # Build output directory
-├── cmd/                    # Main applications
-│   └── server/            # API server application
-│       └── main.go
-├── configs/               # Configuration files
-├── docs/                  # Design and user documents
-├── internal/              # Private application code
-│   ├── handlers/          # HTTP handlers
-│   └── models/            # Data models
-├── pkg/                   # Public libraries
-│   └── api/              # Generated API code (*.gen.go)
-├── scripts/               # Build, install, and analysis scripts
-├── Makefile              # Build automation
-├── go.mod                # Go module definition
-└── README.md             # This file
+├── api/                        # OpenAPI/Swagger specs and code generation config
+│   ├── openapi.yaml           # Main OpenAPI specification (references split files)
+│   ├── oapi-codegen.yaml      # Code generation configuration
+│   ├── paths/                 # API path definitions (split specs)
+│   │   ├── health.yaml        # Health check endpoint
+│   │   ├── users.yaml         # User endpoints
+│   │   └── products.yaml      # Product endpoints
+│   └── schemas/               # API schema definitions (split specs)
+│       ├── common.yaml        # Common schemas (Error, HealthResponse)
+│       ├── users.yaml         # User-related schemas
+│       └── products.yaml      # Product-related schemas
+├── build/                     # Build output directory
+│   └── server                # Compiled binary
+├── cmd/                       # Main applications
+│   └── server/               # API server application
+│       └── main.go           # Application entry point
+├── configs/                   # Configuration files
+├── docs/                      # Design and user documents
+├── internal/                  # Private application code
+│   ├── database/             # Database connection and initialization
+│   │   └── database.go
+│   ├── handlers/             # HTTP handlers implementing ServerInterface
+│   │   ├── handler.go        # Handler struct and constructor
+│   │   ├── users.go          # User endpoints implementation
+│   │   ├── products.go       # Product endpoints implementation
+│   │   └── swagger.go        # Swagger UI handler
+│   └── models/               # GORM database models
+│       ├── user.go           # User entity
+│       └── product.go        # Product entity
+├── pkg/                       # Public libraries
+│   └── api/                  # Generated API code (do not edit)
+│       └── api.gen.go        # Generated types, interfaces, and routes
+├── scripts/                   # Build, install, and analysis scripts
+├── .env.example              # Environment variables template
+├── .env                      # Local environment variables (git ignored)
+├── docker-compose.yml        # Docker Compose configuration
+├── Dockerfile                # Multi-stage Docker build
+├── Makefile                  # Build automation
+├── go.mod                    # Go module definition
+├── go.sum                    # Go dependencies checksums
+├── README.md                 # This file
+├── QUICKSTART.md             # Quick start guide
+└── SPLIT_SPECS.md            # Documentation on split OpenAPI specs
 ```
 
 ## Prerequisites
