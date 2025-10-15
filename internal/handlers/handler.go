@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"gorm.io/gorm"
 	"oapi-codegen-layout/pkg/api"
 )
 
@@ -11,10 +12,10 @@ type Handler struct {
 }
 
 // NewHandler creates a new unified handler
-func NewHandler() *Handler {
+func NewHandler(db *gorm.DB) *Handler {
 	return &Handler{
-		UserHandler:    NewUserHandler(),
-		ProductHandler: NewProductHandler(),
+		UserHandler:    NewUserHandler(db),
+		ProductHandler: NewProductHandler(db),
 	}
 }
 

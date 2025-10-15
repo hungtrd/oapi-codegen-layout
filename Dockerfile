@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.21-alpine AS builder
+FROM golang:1.23-alpine AS builder
 
 # Install dependencies
 RUN apk add --no-cache git make
@@ -9,6 +9,9 @@ WORKDIR /app
 
 # Copy go mod files
 COPY go.mod go.sum ./
+
+# Set GOTOOLCHAIN to auto to download the required Go version
+ENV GOTOOLCHAIN=auto
 
 # Download dependencies
 RUN go mod download
@@ -32,6 +35,9 @@ WORKDIR /root/
 
 # Copy the binary from builder
 COPY --from=builder /app/build/server .
+
+# Copy api directory for OpenAPI spec (needed for Swagger UI)
+COPY --from=builder /app/api ./api
 
 # Expose port
 EXPOSE 8080

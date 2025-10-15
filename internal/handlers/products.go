@@ -7,70 +7,52 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	openapi_types "github.com/oapi-codegen/runtime/types"
+	"gorm.io/gorm"
+	"oapi-codegen-layout/internal/models"
 	"oapi-codegen-layout/pkg/api"
 )
 
 // ProductHandler implements the product-related ServerInterface methods
 type ProductHandler struct {
-	// Add dependencies like database, logger, etc.
+	db *gorm.DB
 }
 
 // NewProductHandler creates a new product handler
-func NewProductHandler() *ProductHandler {
-	return &ProductHandler{}
+func NewProductHandler(db *gorm.DB) *ProductHandler {
+	return &ProductHandler{
+		db: db,
+	}
 }
 
 // ListProducts returns a list of products
 // (GET /products)
 func (h *ProductHandler) ListProducts(c *gin.Context, params api.ListProductsParams) {
-	// Mock data for demonstration
-	products := []api.Product{
-		{
-			Id:          openapi_types.UUID(uuid.New()),
-			Name:        "Laptop",
-			Description: strPtr("High-performance laptop"),
-			Price:       1299.99,
-			Category:    "Electronics",
-			Stock:       int32Ptr(10),
-			CreatedAt:   time.Now().Add(-24 * time.Hour),
-			UpdatedAt:   timePtr(time.Now()),
-		},
-		{
-			Id:          openapi_types.UUID(uuid.New()),
-			Name:        "Wireless Mouse",
-			Description: strPtr("Ergonomic wireless mouse"),
-			Price:       29.99,
-			Category:    "Electronics",
-			Stock:       int32Ptr(50),
-			CreatedAt:   time.Now().Add(-48 * time.Hour),
-			UpdatedAt:   timePtr(time.Now()),
-		},
-		{
-			Id:          openapi_types.UUID(uuid.New()),
-			Name:        "Office Chair",
-			Description: strPtr("Comfortable office chair"),
-			Price:       199.99,
-			Category:    "Furniture",
-			Stock:       int32Ptr(15),
-			CreatedAt:   time.Now().Add(-72 * time.Hour),
-			UpdatedAt:   timePtr(time.Now()),
-		},
-	}
+	var dbProducts []models.Product
+
+	query := h.db
 
 	// Apply category filter if provided
 	if params.Category != nil && *params.Category != "" {
-		filtered := []api.Product{}
-		for _, p := range products {
-			if p.Category == *params.Category {
-				filtered = append(filtered, p)
-			}
-		}
-		products = filtered
+		query = query.Where("category = ?", *params.Category)
 	}
 
 	// Apply limit if provided
-	if params.Limit != nil && int(*params.Limit) < len(products) {
-		products = products[:*params.Limit]
+	if params.Limit != nil {
+		query = query.Limit(int(*params.Limit))
+	}
+
+	if err := query.Find(&dbProducts).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, api.Error{
+			Code:    "database_error",
+			Message: "Failed to retrieve products",
+		})
+		return
+	}
+
+	// Convert database products to API products
+	products := make([]api.Product, len(dbProducts))
+	for i, dbProduct := range dbProducts {
+		products[i] = dbProductToAPIProduct(&dbProduct)
 	}
 
 	c.JSON(http.StatusOK, products)
@@ -88,17 +70,20 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 		return
 	}
 
-	// Create product (mock implementation)
-	product := api.Product{
-		Id:          openapi_types.UUID(uuid.New()),
-		Name:        req.Name,
-		Description: req.Description,
-		Price:       req.Price,
-		Category:    req.Category,
-		Stock:       req.Stock,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   timePtr(time.Now()),
+	// Convert API request to database model
+	dbProduct := apiCreateProductToDBProduct(&req)
+
+	// Create product in database
+	if err := h.db.Create(dbProduct).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, api.Error{
+			Code:    "database_error",
+			Message: "Failed to create product",
+		})
+		return
 	}
+
+	// Convert database model to API model
+	product := dbProductToAPIProduct(dbProduct)
 
 	c.JSON(http.StatusCreated, product)
 }
@@ -106,17 +91,26 @@ func (h *ProductHandler) CreateProduct(c *gin.Context) {
 // GetProductById retrieves a product by ID
 // (GET /products/{productId})
 func (h *ProductHandler) GetProductById(c *gin.Context, productId openapi_types.UUID) {
-	// Mock product retrieval
-	product := api.Product{
-		Id:          productId,
-		Name:        "Sample Product",
-		Description: strPtr("This is a sample product"),
-		Price:       99.99,
-		Category:    "Electronics",
-		Stock:       int32Ptr(25),
-		CreatedAt:   time.Now().Add(-24 * time.Hour),
-		UpdatedAt:   timePtr(time.Now()),
+	var dbProduct models.Product
+
+	// Query product by ID
+	if err := h.db.Where("id = ?", uuid.UUID(productId)).First(&dbProduct).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, api.Error{
+				Code:    "not_found",
+				Message: "Product not found",
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, api.Error{
+				Code:    "database_error",
+				Message: "Failed to retrieve product",
+			})
+		}
+		return
 	}
+
+	// Convert database model to API model
+	product := dbProductToAPIProduct(&dbProduct)
 
 	c.JSON(http.StatusOK, product)
 }
@@ -133,17 +127,52 @@ func (h *ProductHandler) UpdateProduct(c *gin.Context, productId openapi_types.U
 		return
 	}
 
-	// Mock product update
-	product := api.Product{
-		Id:          productId,
-		Name:        getOrDefault(req.Name, "Updated Product"),
-		Description: req.Description,
-		Price:       getOrDefaultFloat(req.Price, 0),
-		Category:    getOrDefault(req.Category, "General"),
-		Stock:       req.Stock,
-		CreatedAt:   time.Now().Add(-24 * time.Hour),
-		UpdatedAt:   timePtr(time.Now()),
+	var dbProduct models.Product
+
+	// Query product by ID
+	if err := h.db.Where("id = ?", uuid.UUID(productId)).First(&dbProduct).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, api.Error{
+				Code:    "not_found",
+				Message: "Product not found",
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, api.Error{
+				Code:    "database_error",
+				Message: "Failed to retrieve product",
+			})
+		}
+		return
 	}
+
+	// Update fields if provided
+	if req.Name != nil {
+		dbProduct.Name = *req.Name
+	}
+	if req.Description != nil {
+		dbProduct.Description = req.Description
+	}
+	if req.Price != nil {
+		dbProduct.Price = *req.Price
+	}
+	if req.Category != nil {
+		dbProduct.Category = *req.Category
+	}
+	if req.Stock != nil {
+		dbProduct.Stock = *req.Stock
+	}
+
+	// Save updated product
+	if err := h.db.Save(&dbProduct).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, api.Error{
+			Code:    "database_error",
+			Message: "Failed to update product",
+		})
+		return
+	}
+
+	// Convert database model to API model
+	product := dbProductToAPIProduct(&dbProduct)
 
 	c.JSON(http.StatusOK, product)
 }
@@ -151,7 +180,33 @@ func (h *ProductHandler) UpdateProduct(c *gin.Context, productId openapi_types.U
 // DeleteProduct deletes a product
 // (DELETE /products/{productId})
 func (h *ProductHandler) DeleteProduct(c *gin.Context, productId openapi_types.UUID) {
-	// Mock product deletion - productId is already validated by the generated middleware
+	var dbProduct models.Product
+
+	// Query product by ID
+	if err := h.db.Where("id = ?", uuid.UUID(productId)).First(&dbProduct).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, api.Error{
+				Code:    "not_found",
+				Message: "Product not found",
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, api.Error{
+				Code:    "database_error",
+				Message: "Failed to retrieve product",
+			})
+		}
+		return
+	}
+
+	// Delete product (soft delete by default with GORM)
+	if err := h.db.Delete(&dbProduct).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, api.Error{
+			Code:    "database_error",
+			Message: "Failed to delete product",
+		})
+		return
+	}
+
 	c.Status(http.StatusNoContent)
 }
 
@@ -180,4 +235,33 @@ func getOrDefaultFloat(ptr *float64, def float64) float64 {
 		return *ptr
 	}
 	return def
+}
+
+// Helper functions to convert between database models and API models
+func dbProductToAPIProduct(dbProduct *models.Product) api.Product {
+	return api.Product{
+		Id:          openapi_types.UUID(dbProduct.ID),
+		Name:        dbProduct.Name,
+		Description: dbProduct.Description,
+		Price:       dbProduct.Price,
+		Category:    dbProduct.Category,
+		Stock:       &dbProduct.Stock,
+		CreatedAt:   dbProduct.CreatedAt,
+		UpdatedAt:   &dbProduct.UpdatedAt,
+	}
+}
+
+func apiCreateProductToDBProduct(req *api.CreateProductRequest) *models.Product {
+	product := &models.Product{
+		Name:     req.Name,
+		Price:    req.Price,
+		Category: req.Category,
+	}
+	if req.Description != nil {
+		product.Description = req.Description
+	}
+	if req.Stock != nil {
+		product.Stock = *req.Stock
+	}
+	return product
 }

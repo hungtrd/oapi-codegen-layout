@@ -28,8 +28,9 @@ A Go project following the [golang-standards/project-layout](https://github.com/
 
 ## Prerequisites
 
-- Go 1.21 or higher
+- Go 1.25 or higher
 - Make (optional, for using Makefile commands)
+- Docker and Docker Compose (for containerized deployment)
 
 ## Getting Started
 
@@ -138,6 +139,111 @@ curl -X POST http://localhost:8080/api/v1/users \
 curl http://localhost:8080/api/v1/users/{userId}
 ```
 
+## Docker Deployment
+
+### Quick Start with Docker Compose
+
+Start the entire application stack (API + MySQL) with a single command:
+
+```bash
+make docker-compose-up
+```
+
+This will:
+- Start a MySQL 8.0 container
+- Start the API server container
+- Automatically create and migrate the database schema
+- Expose the API on http://localhost:8080
+- Expose MySQL on localhost:3306
+
+Access the application:
+- **API**: http://localhost:8080
+- **Swagger UI**: http://localhost:8080/swagger/index.html
+- **OpenAPI Spec**: http://localhost:8080/openapi.json
+
+### Docker Commands
+
+```bash
+# Build and start all services
+make docker-compose-up
+
+# View logs from all services
+make docker-compose-logs
+
+# Stop all services
+make docker-compose-down
+
+# Rebuild services after code changes
+make docker-compose-build
+
+# Restart services
+make docker-compose-restart
+
+# Clean up all Docker resources (containers, images, volumes)
+make docker-clean
+```
+
+### Environment Configuration
+
+The application uses environment variables for database configuration. Create a `.env` file in the project root:
+
+```env
+# Database Configuration
+DB_USER=appuser
+DB_PASSWORD=password
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=example_db
+```
+
+**Note**: The `.env` file is already included in `.gitignore`. Never commit sensitive credentials to version control.
+
+### Database
+
+The Docker setup includes:
+- **MySQL 8.0** container with persistent volume
+- **Automatic schema migration** on startup using GORM
+- **Health checks** to ensure MySQL is ready before starting the API
+
+Database models are defined in `internal/models/`:
+- `User` - User entity with UUID, email, name, and timestamps
+- `Product` - Product entity with UUID, name, description, price, category, stock, and timestamps
+
+Both models support soft deletes (records are marked as deleted but not actually removed).
+
+### Testing the Dockerized API
+
+Once the services are running, test the API:
+
+```bash
+# Health check
+curl http://localhost:8080/api/v1/health
+
+# Create a user
+curl -X POST http://localhost:8080/api/v1/users \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","name":"Test User"}'
+
+# List users
+curl http://localhost:8080/api/v1/users
+
+# Create a product
+curl -X POST http://localhost:8080/api/v1/products \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Laptop","price":1299.99,"category":"Electronics","stock":10}'
+
+# List products
+curl http://localhost:8080/api/v1/products
+```
+
+### Docker Architecture
+
+The docker-compose setup includes:
+- **API Service**: Go application built with multi-stage Dockerfile
+- **MySQL Service**: MySQL 8.0 with persistent volume storage
+- **Network**: Bridge network for service communication
+- **Health Checks**: Ensures MySQL is ready before starting API
+
 ## Development
 
 ### Code Generation
@@ -179,6 +285,7 @@ The handler must implement the `ServerInterface` from the generated code.
 
 ## Makefile Commands
 
+### Development Commands
 - `make help` - Display all available commands
 - `make install-tools` - Install required development tools
 - `make generate` - Generate API code from OpenAPI spec
@@ -189,6 +296,16 @@ The handler must implement the `ServerInterface` from the generated code.
 - `make deps` - Download and tidy dependencies
 - `make fmt` - Format code
 - `make lint` - Run linter
+
+### Docker Commands
+- `make docker-compose-up` - Start all services with docker-compose
+- `make docker-compose-down` - Stop all services
+- `make docker-compose-logs` - Show logs from all services
+- `make docker-compose-build` - Build docker-compose services
+- `make docker-compose-restart` - Restart all services
+- `make docker-clean` - Remove all containers, images, and volumes
+- `make docker-build` - Build Docker image
+- `make docker-run` - Run Docker container
 
 ## Project Layout
 

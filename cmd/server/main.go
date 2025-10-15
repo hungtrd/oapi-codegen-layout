@@ -3,15 +3,22 @@ package main
 import (
 	"log"
 	"net/http"
+	"oapi-codegen-layout/internal/database"
+	"oapi-codegen-layout/internal/handlers"
+	"oapi-codegen-layout/pkg/api"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"oapi-codegen-layout/internal/handlers"
-	"oapi-codegen-layout/pkg/api"
 )
 
 func main() {
+	// Initialize database connection
+	db, err := database.InitDB()
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+
 	// Create Gin router
 	router := gin.Default()
 
@@ -20,7 +27,7 @@ func main() {
 	router.Use(gin.Recovery())
 
 	// Create unified handler that implements all API endpoints
-	handler := handlers.NewHandler()
+	handler := handlers.NewHandler(db)
 
 	// Swagger endpoints - serve OpenAPI spec at a different path to avoid conflicts
 	router.GET("/openapi.json", handlers.GetSwaggerJSON)

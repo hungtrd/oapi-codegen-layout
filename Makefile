@@ -1,4 +1,4 @@
-.PHONY: help generate build run clean test install-tools
+.PHONY: help generate build run clean test install-tools docker-build docker-run docker-compose-up docker-compose-down docker-compose-logs docker-compose-build docker-compose-restart docker-clean
 
 help: ## Display this help message
 	@echo "Available targets:"
@@ -64,3 +64,33 @@ docker-build: ## Build Docker image
 docker-run: docker-build ## Run Docker container
 	@echo "Running Docker container..."
 	@docker run -p 8080:8080 oapi-codegen-layout:latest
+
+docker-compose-up: ## Start all services with docker-compose
+	@echo "Starting services with docker-compose..."
+	@docker-compose up -d
+	@echo "Services started. API available at http://localhost:8080"
+	@echo "Swagger UI available at http://localhost:8080/swagger/index.html"
+
+docker-compose-down: ## Stop all services
+	@echo "Stopping services..."
+	@docker-compose down
+	@echo "Services stopped"
+
+docker-compose-logs: ## Show logs from all services
+	@docker-compose logs -f
+
+docker-compose-build: ## Build docker-compose services
+	@echo "Building docker-compose services..."
+	@docker-compose build
+	@echo "Build complete"
+
+docker-compose-restart: ## Restart all services
+	@echo "Restarting services..."
+	@docker-compose restart
+	@echo "Services restarted"
+
+docker-clean: ## Remove all containers, images, and volumes
+	@echo "Cleaning Docker resources..."
+	@docker-compose down -v
+	@docker rmi oapi-codegen-layout:latest || true
+	@echo "Docker resources cleaned"
