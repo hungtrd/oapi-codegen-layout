@@ -1,0 +1,91 @@
+openapi: 3.0.3
+info:
+  title: Product Schemas
+  version: 1.0.0
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - category
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: double
+          minimum: 0
+        category:
+          type: string
+        stock:
+          type: integer
+          format: int32
+          minimum: 0
+          default: 0
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateProductRequest:
+      type: object
+      required:
+        - name
+        - price
+        - category
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+        price:
+          type: number
+          format: double
+          minimum: 0
+        category:
+          type: string
+          minLength: 1
+          maxLength: 100
+        stock:
+          type: integer
+          format: int32
+          minimum: 0
+          default: 0
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+        price:
+          type: number
+          format: double
+          minimum: 0
+        category:
+          type: string
+          minLength: 1
+          maxLength: 100
+        stock:
+          type: integer
+          format: int32
+          minimum: 0

@@ -1,0 +1,5 @@
+package: products
+generate:
+  models: true
+  embedded-spec: true
+output: pkg/api/models/products/types.gen.go
