@@ -30,7 +30,8 @@ run: generate ## Run the application
 clean: ## Clean build artifacts and generated files
 	@echo "Cleaning..."
 	@rm -rf build/
-	@rm -rf pkg/api/
+	@find pkg/api -name "*.gen.go" -type f -delete
+	@rm -f coverage.out coverage.html
 	@echo "Clean complete"
 
 test: ## Run tests
