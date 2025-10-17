@@ -1,0 +1,13 @@
+package: users
+generate:
+  gin-server: true
+  models: true
+  embedded-spec: true
+output: users.gen.go
+output-options:
+  skip-prune: true
+import-mapping:
+  ../../schemas/User.yaml: oapi-codegen-layout/pkg/api/models
+  ../../schemas/CreateUserRequest.yaml: oapi-codegen-layout/pkg/api/models
+  ../../schemas/UpdateUserRequest.yaml: oapi-codegen-layout/pkg/api/models
+  ../../schemas/Error.yaml: oapi-codegen-layout/pkg/api/models
