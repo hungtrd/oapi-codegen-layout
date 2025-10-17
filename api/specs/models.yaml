@@ -1,0 +1,24 @@
+openapi: 3.0.3
+info:
+  title: Shared Models
+  description: Shared data models for the API
+  version: 1.0.0
+
+components:
+  schemas:
+    HealthResponse:
+      $ref: "../schemas/HealthResponse.yaml"
+    User:
+      $ref: "../schemas/User.yaml"
+    CreateUserRequest:
+      $ref: "../schemas/CreateUserRequest.yaml"
+    UpdateUserRequest:
+      $ref: "../schemas/UpdateUserRequest.yaml"
+    Product:
+      $ref: "../schemas/Product.yaml"
+    CreateProductRequest:
+      $ref: "../schemas/CreateProductRequest.yaml"
+    UpdateProductRequest:
+      $ref: "../schemas/UpdateProductRequest.yaml"
+    Error:
+      $ref: "../schemas/Error.yaml"

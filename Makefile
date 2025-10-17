@@ -11,8 +11,18 @@ install-tools: ## Install required tools
 
 generate: ## Generate API code from OpenAPI spec
 	@echo "Generating API code from split specs..."
-	@mkdir -p pkg/api
-	@oapi-codegen -config api/oapi-codegen.yaml api/openapi.yaml
+	@mkdir -p pkg/api/models
+	@mkdir -p pkg/api/users
+	@mkdir -p pkg/api/products
+	@mkdir -p pkg/api/health
+	@echo "Generating models..."
+	@oapi-codegen -config api/configs/models.yaml api/specs/models.yaml
+	@echo "Generating users handler..."
+	@oapi-codegen -config api/configs/users.yaml api/specs/users.yaml
+	@echo "Generating products handler..."
+	@oapi-codegen -config api/configs/products.yaml api/specs/products.yaml
+	@echo "Generating health handler..."
+	@oapi-codegen -config api/configs/health.yaml api/specs/health.yaml
 	@echo "Code generation complete"
 
 build: generate ## Build the application

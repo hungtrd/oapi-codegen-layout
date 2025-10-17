@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"oapi-codegen-layout/internal/database"
 	"oapi-codegen-layout/internal/handlers"
-	"oapi-codegen-layout/pkg/api"
+	"oapi-codegen-layout/pkg/api/health"
+	"oapi-codegen-layout/pkg/api/products"
+	"oapi-codegen-layout/pkg/api/users"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -26,8 +28,10 @@ func main() {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	// Create unified handler that implements all API endpoints
-	handler := handlers.NewHandler(db)
+	// Create separate handlers for each domain
+	userHandler := handlers.NewUserHandler(db)
+	productHandler := handlers.NewProductHandler(db)
+	healthHandler := handlers.NewHealthHandler()
 
 	// Swagger endpoints - serve OpenAPI spec at a different path to avoid conflicts
 	router.GET("/openapi.json", handlers.GetSwaggerJSON)
@@ -35,7 +39,11 @@ func main() {
 
 	// Register routes with the API version prefix
 	apiGroup := router.Group("/api/v1")
-	api.RegisterHandlers(apiGroup, handler)
+
+	// Register each handler to its routes
+	users.RegisterHandlers(apiGroup, userHandler)
+	products.RegisterHandlers(apiGroup, productHandler)
+	health.RegisterHandlers(apiGroup, healthHandler)
 
 	// Start server
 	port := ":8080"

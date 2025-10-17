@@ -4,12 +4,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"oapi-codegen-layout/pkg/api"
+	"oapi-codegen-layout/pkg/api/models"
 )
 
 // GetSwaggerJSON serves the OpenAPI specification as JSON
 func GetSwaggerJSON(c *gin.Context) {
-	swagger, err := api.GetSwagger()
+	swagger, err := models.GetSwagger()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to load OpenAPI spec",
