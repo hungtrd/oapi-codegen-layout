@@ -15,14 +15,7 @@ generate: ## Generate API code from OpenAPI spec
 	@mkdir -p pkg/api/users
 	@mkdir -p pkg/api/products
 	@mkdir -p pkg/api/health
-	@echo "Generating models..."
-	@oapi-codegen -config api/configs/models.yaml api/specs/models.yaml
-	@echo "Generating users handler..."
-	@oapi-codegen -config api/configs/users.yaml api/specs/users.yaml
-	@echo "Generating products handler..."
-	@oapi-codegen -config api/configs/products.yaml api/specs/products.yaml
-	@echo "Generating health handler..."
-	@oapi-codegen -config api/configs/health.yaml api/specs/health.yaml
+	@go generate ./...
 	@echo "Code generation complete"
 
 build: generate ## Build the application

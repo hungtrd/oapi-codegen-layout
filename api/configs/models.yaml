@@ -1,7 +1,0 @@
-package: models
-generate:
-  models: true
-  embedded-spec: true
-output: pkg/api/models/models.gen.go
-output-options:
-  skip-prune: true
