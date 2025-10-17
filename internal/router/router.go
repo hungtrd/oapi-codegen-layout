@@ -1,6 +1,7 @@
 package router
 
 import (
+	"oapi-codegen-layout/internal/config"
 	"oapi-codegen-layout/internal/handlers"
 	"oapi-codegen-layout/pkg/api/health"
 	"oapi-codegen-layout/pkg/api/products"
@@ -13,7 +14,10 @@ import (
 )
 
 // Setup creates and configures the Gin router with all routes and middleware
-func Setup(db *gorm.DB) *gin.Engine {
+func Setup(cfg *config.ServerConfig, db *gorm.DB) *gin.Engine {
+	// Set Gin mode based on configuration
+	gin.SetMode(cfg.Mode)
+
 	// Create Gin router
 	router := gin.Default()
 

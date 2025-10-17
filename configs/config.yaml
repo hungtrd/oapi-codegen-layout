@@ -1,0 +1,15 @@
+# Application Configuration
+
+server:
+  # Server port
+  port: "8080"
+  # Gin mode: debug, release, or test
+  mode: "debug"
+
+database:
+  # Database connection settings
+  host: "localhost"
+  port: "3306"
+  user: "root"
+  password: "password"
+  name: "example_db"

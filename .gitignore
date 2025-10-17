@@ -35,3 +35,9 @@ Thumbs.db
 # Environment files
 .env
 .env.local
+
+# Local configuration overrides
+configs/config.local.yaml
+configs/config.*.yaml
+!configs/config.yaml
+!configs/config.example.yaml
