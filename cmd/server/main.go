@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,8 +11,12 @@ import (
 )
 
 func main() {
+	// Define command-line flags
+	configPath := flag.String("config", "", "Path to configuration file (default: auto-search in . and ./configs)")
+	flag.Parse()
+
 	// Load configuration
-	cfg, err := config.Load("")
+	cfg, err := config.Load(*configPath)
 	if err != nil {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
