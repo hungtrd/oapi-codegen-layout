@@ -11,8 +11,11 @@ install-tools: ## Install required tools
 
 generate: ## Generate API code from OpenAPI spec
 	@echo "Generating API code from split specs..."
-	@mkdir -p pkg/api
-	@oapi-codegen -config api/oapi-codegen.yaml api/openapi.yaml
+	@mkdir -p pkg/api/models
+	@mkdir -p pkg/api/users
+	@mkdir -p pkg/api/products
+	@mkdir -p pkg/api/health
+	@go generate ./...
 	@echo "Code generation complete"
 
 build: generate ## Build the application
@@ -27,7 +30,8 @@ run: generate ## Run the application
 clean: ## Clean build artifacts and generated files
 	@echo "Cleaning..."
 	@rm -rf build/
-	@rm -rf pkg/api/
+	@find pkg/api -name "*.gen.go" -type f -delete
+	@rm -f coverage.out coverage.html
 	@echo "Clean complete"
 
 test: ## Run tests

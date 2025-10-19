@@ -1,46 +1,41 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
+	"oapi-codegen-layout/internal/config"
 	"oapi-codegen-layout/internal/database"
-	"oapi-codegen-layout/internal/handlers"
-	"oapi-codegen-layout/pkg/api"
-
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
+	"oapi-codegen-layout/internal/router"
 )
 
 func main() {
+	// Define command-line flags
+	configPath := flag.String("config", "", "Path to configuration file (default: auto-search in . and ./configs)")
+	flag.Parse()
+
+	// Load configuration
+	cfg, err := config.Load(*configPath)
+	if err != nil {
+		log.Fatalf("Failed to load configuration: %v", err)
+	}
+
+	log.Printf("Starting application in %s mode", cfg.Server.Mode)
+
 	// Initialize database connection
-	db, err := database.InitDB()
+	db, err := database.InitDB(&cfg.Database)
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
-	// Create Gin router
-	router := gin.Default()
-
-	// Add middleware
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
-
-	// Create unified handler that implements all API endpoints
-	handler := handlers.NewHandler(db)
-
-	// Swagger endpoints - serve OpenAPI spec at a different path to avoid conflicts
-	router.GET("/openapi.json", handlers.GetSwaggerJSON)
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.URL("/openapi.json")))
-
-	// Register routes with the API version prefix
-	apiGroup := router.Group("/api/v1")
-	api.RegisterHandlers(apiGroup, handler)
+	// Setup router with all routes and middleware
+	r := router.Setup(&cfg.Server, db)
 
 	// Start server
-	port := ":8080"
-	log.Printf("Starting server on %s", port)
-	if err := http.ListenAndServe(port, router); err != nil {
+	addr := fmt.Sprintf(":%s", cfg.Server.Port)
+	log.Printf("Starting server on %s", addr)
+	if err := http.ListenAndServe(addr, r); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
